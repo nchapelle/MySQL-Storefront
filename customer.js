@@ -1,7 +1,7 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql"); 
 const Ctable = require('console.table');
- 
+// let PORT = 8080; // process.env.PORT || 8080;
 const connection = mysql.createConnection({
     host: "localhost",
   
@@ -18,22 +18,23 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
 if (err) throw err;
 console.log("connected as id " + connection.threadId + "\n");
-customerPurchase();
+readProducts();
 });
 
   
-var userName = null;
+// var userName = null;
 
 
-console.log("\nWelcome to AMAZONOLAN");
 //this is to display all data from pdts table (#5)
 function readProducts() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM Products", function(err, res) {
       if (err) throw err;
       // Log all results of the SELECT statement
-    
+      console.log("\nWelcome to AMAZONOLAN");
       console.table(res);
+      customerPurchase();
+
     });
   }
 
@@ -63,25 +64,17 @@ function customerPurchase(){
     
         console.log("Thank You for your purchase.\nUpdating our stock...");
         var query = connection.query(
-          "UPDATE Products SET ? WHERE ?",
-          [
-            {
-              item_ID: id
-            },
-            {
-              quantity: quantity-userquantity
-            }
-          ],
+          "UPDATE Products SET quantity=quantity-"+parseInt(userquantity)+" WHERE item_ID="+id,
           function(err, res) {
             if (err) throw err;
             console.log(res.affectedRows + " products updated!\n");
-
+            readProducts();
           }
         );
     
       
   }
-  connection.end();
+  // connection.end();
 
 // let signup = function(userName, userPassword){
 //     var query = connection.query(
